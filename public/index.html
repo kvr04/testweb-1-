@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Dodge Rush - An intense, fast-paced browser arcade survival game where you dodge falling cosmic hazards and race for high scores!">
+  <title>Dodge Rush | Arcade Survival Game</title>
+  
+  <!-- Google Fonts: Orbitron & Inter for high-tech arcade feel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background Particle Starfield Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="app-container">
+
+    <!-- Top Telemetry & Global Stats Bar -->
+    <header class="top-bar">
+      <div class="brand">
+        <span class="logo-icon">⚡</span>
+        <span class="brand-text">DODGE RUSH</span>
+      </div>
+      <div class="global-stats" id="global-stats">
+        <div class="stat-pill"><span class="stat-label">Active:</span> <span id="stat-active" class="stat-val">0</span></div>
+        <div class="stat-pill"><span class="stat-label">Global Best:</span> <span id="stat-global-best" class="stat-val">0</span></div>
+        <div class="stat-pill"><span class="stat-label">Played:</span> <span id="stat-total" class="stat-val">0</span></div>
+      </div>
+      <button id="sound-btn" class="icon-btn" aria-label="Toggle Sound" title="Toggle Sound (M)">
+        <span id="sound-icon">🔊</span>
+      </button>
+    </header>
+
+    <!-- MAIN GAME AREA CONTAINER -->
+    <main class="game-viewport" id="game-viewport">
+
+      <!-- LANDING SCREEN -->
+      <section id="start-screen" class="screen active">
+        <div class="card landing-card">
+          <div class="title-container">
+            <h1 class="game-title">DODGE <span class="highlight">RUSH</span></h1>
+            <p class="subtitle">How long can you survive?</p>
+          </div>
+
+          <div class="high-score-badge">
+            <span class="trophy-icon">🏆</span>
+            <div class="hs-text">
+              <span class="hs-label">YOUR HIGH SCORE</span>
+              <span id="landing-high-score" class="hs-value">0</span>
+            </div>
+          </div>
+
+          <div class="instructions-box">
+            <h3>HOW TO PLAY</h3>
+            <div class="controls-grid">
+              <div class="control-item">
+                <span class="key-badge">←</span> <span class="key-badge">→</span> or <span class="key-badge">A</span> <span class="key-badge">D</span>
+                <span class="control-desc">Move Ship</span>
+              </div>
+              <div class="control-item">
+                <span class="touch-icon">📱</span>
+                <span class="control-desc">Tap / Drag Screen on Mobile</span>
+              </div>
+            </div>
+            <ul class="tips-list">
+              <li>☄️ Avoid falling meteorites & plasmoid hazards.</li>
+              <li>⚡ Speed & hazard frequency increase over time.</li>
+              <li>🛡️ Collect glowing <strong class="cyan-text">Shields</strong> & <strong class="gold-text">Bonus Orbs</strong>!</li>
+            </ul>
+          </div>
+
+          <button id="start-btn" class="btn primary-btn pulse-btn">
+            <span class="btn-text">PLAY GAME</span>
+            <span class="btn-icon">▶</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- GAMEPLAY CANVAS & HUD SCREEN -->
+      <section id="game-screen" class="screen">
+        <!-- HUD Overlay Header -->
+        <div class="hud-overlay">
+          <div class="hud-left">
+            <div class="hud-item">
+              <span class="hud-label">SCORE</span>
+              <span id="hud-score" class="hud-value neon-cyan">0</span>
+            </div>
+            <div class="hud-item multiplier-item">
+              <span class="hud-label">SPEED</span>
+              <span id="hud-multiplier" class="hud-value neon-gold">1.0x</span>
+            </div>
+          </div>
+
+          <div class="hud-center">
+            <div class="hud-item">
+              <span class="hud-label">TIME</span>
+              <span id="hud-time" class="hud-value">00:00.0</span>
+            </div>
+          </div>
+
+          <div class="hud-right">
+            <div class="hud-item">
+              <span class="hud-label">BEST</span>
+              <span id="hud-best" class="hud-value neon-magenta">0</span>
+            </div>
+            <div id="shield-indicator" class="shield-indicator hidden">
+              <span class="shield-icon">🛡️</span> SHIELD
+            </div>
+          </div>
+        </div>
+
+        <!-- Gameplay Canvas -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- Mobile Touch Controls Overlay -->
+        <div id="mobile-controls" class="mobile-controls">
+          <button id="btn-left" class="touch-btn" aria-label="Move Left">
+            <span>◀</span>
+          </button>
+          <button id="btn-right" class="touch-btn" aria-label="Move Right">
+            <span>▶</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- GAME OVER SCREEN MODAL -->
+      <section id="game-over-screen" class="screen">
+        <div class="card game-over-card">
+          <h2 class="game-over-title">GAME OVER</h2>
+          <div id="new-high-score-banner" class="new-record-banner hidden">
+            ✨ NEW HIGH SCORE! ✨
+          </div>
+
+          <div class="stats-summary-grid">
+            <div class="summary-box">
+              <span class="summary-label">FINAL SCORE</span>
+              <span id="go-final-score" class="summary-value neon-cyan">0</span>
+            </div>
+            <div class="summary-box">
+              <span class="summary-label">HIGH SCORE</span>
+              <span id="go-best-score" class="summary-value neon-magenta">0</span>
+            </div>
+            <div class="summary-box">
+              <span class="summary-label">SURVIVAL TIME</span>
+              <span id="go-survival-time" class="summary-value">00:00</span>
+            </div>
+            <div class="summary-box">
+              <span class="summary-label">DODGED HAZARDS</span>
+              <span id="go-dodged-count" class="summary-value neon-gold">0</span>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button id="restart-btn" class="btn primary-btn pulse-btn">
+              <span class="btn-text">PLAY AGAIN</span>
+              <span class="btn-icon">🔄</span>
+            </button>
+            <button id="menu-btn" class="btn secondary-btn">
+              <span class="btn-text">MAIN MENU</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Dodge Rush &copy; 2026 | Built for <span class="devsight-tag">DevSight AI</span> Monitoring Demo</p>
+    </footer>
+
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
